@@ -53,20 +53,18 @@ void printInfo(int x[]) {
 	printf("%s", parity(x));
 }
 
-void fileReader() {
+void fileReader(int argc, char** argv) {
 	int val[8] = { 0 };
 	int fileEOF = 0, i = 0, num = 0, size = 4, z = 0;
-	char* filename = (char*)malloc(20);	
+	//char* filename = (char*)malloc(20);	
 	char test = '-';
 	
-	scanf("%s", filename);
-	
-	if (filename == test || filename == "") {
+	if (argc != 2) {
 		printf("Please enter the file name.\n");
-		scanf("%s", filename);		
+		scanf("%s", argv[1]);
 	}
-	strcat(filename, ".txt");
-	FILE* file = fopen(filename, "r");
+	
+	FILE* file = fopen(argv[1], "r");
 	
 	printf("Original ASCII    Decimal  Parity \n");
 	printf("-------- -------- -------- -------- \n");
@@ -92,7 +90,7 @@ void fileReader() {
 	printInfo(val);
 }
 
-int main() {
-	fileReader();
+int main(int argc, char** argv) {
+	fileReader(argc, argv);
 	return 0;
 }
