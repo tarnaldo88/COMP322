@@ -58,7 +58,7 @@ void fileReader(int argc, char** argv) {
     int fileEOF = 0, i = 0, num = 0, size = 4, z = 0;
     //char* filename = (char*)malloc(20);
     char test = malloc((50)*sizeof(char));
-    File * file;
+    FILE * file;
 
     if (argc < 2) {
         printf("Please enter the file name.\n");
