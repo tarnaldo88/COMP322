@@ -1,6 +1,5 @@
 ALL:
-	gcc -c ArnaldoTorres.c -Wall -Wextra
-	gcc -o ArnaldoTorres ArnaldoTorres.o -lm
+	gcc ArnaldoTorres.c -Wall -Wextra -lm -o ArnaldoTorres.out
 
 REM:
-	rm ArnaldoTorres ArnaldoTorres.o
+	rm ArnaldoTorres ArnaldoTorres.o 
