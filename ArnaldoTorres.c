@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <io.h>
 
 //converts binary number to decimal number
 int binToDec(int x[]) {
@@ -49,21 +51,88 @@ void printInfo(int x[]) {
     printf("%s", parity(x));
 }
 
-void fileReader(int argc, char** argv) {
+void fileLoop(char * arg)
+{
+    int i = 0, z = 0, num = 0;
     int val[8] = { 0 };
-    int i = 0, num = 0, z = 0;
-    char * test = "-";
+    char fileContents[160];
+    char space = ' ';
     FILE * file;
+    file = open(arg, "r");
+    int fd = fileno(file);
+    size_t numBytes = sizeof(fileContents);;
+    ssize_t bytesRead = read(fd, fileContents, numBytes);
+
+    for( i =0; i < bytesRead; i++)
+    {
+        if(space == fileContents[i] && (z < 8 && z > 0)){
+            printInfo(val);
+            //reset the array to all 0s
+            for (z = 0; z < 8; z++) {
+                val[z] = 0;
+            }
+            printf("\n");
+        } else {
+            val[z] = fileContents[i] - 48;
+            z++;
+            i++;
+            //put values into array until all 8 binary numbers are received
+            if (z == 8) {
+                //binary number recieved, print the converted data taken from binary
+                printInfo(val);
+                //reset the array to all 0s
+                for (z = 0; z < 8; z++) {
+                    val[z] = 0;
+                }
+                printf("\n");
+            }
+        }
+        z = 0;
+    }
+    // printInfo(val);
+    free(file);
+}
+
+
+void fileReader(int argc, char** argv) {
+
+    struct stat checkFile;
+    int val[8] = { 0 };
+    int i = 0, z = 0, fd = 0;
+    char consoleContents[160];
+    size_t numBytes;
+    ssize_t bytesRead;
+    char dash = '-';
+
+    printf("Original ASCII    Decimal  Parity \n");
+    printf("-------- -------- -------- -------- \n");
+
+    if (strcmp(argv[1],dash) == 0){
+
+    }
+    //checks to see if a filename was input or instead just binary
+    if (checkFile(argv[1], &checkFile) == 0)
+    {
+        fileLoop(argv[1]);
+    } else {
+        //filename not found read contents from the console
+        numBytes = sizeof(consoleContents);
+        bytesRead = read(fd, consoleContents, numBytes);
+
+        for(i = 0; i < bytesRead; i++)
+        {
+
+        }
+    }
 
     if (strcmp(test, argv[1]) == 0) {
         //there was no file name so read the 8 bits from the command line
-        printf("Original ASCII    Decimal  Parity \n");
-        printf("-------- -------- -------- -------- \n");
-        for (i = 0; i < argc; i++)
+        for (i = 2; i < argc; i++)
         {
+            test = argv[i];
             for(z = 0; z < 8; i++)
             {
-                val[z] = argv[i][z] - 48;
+                val[z] = test[z] - 48;
             }
             printInfo(val);
             //reset the array to all 0s
@@ -72,32 +141,8 @@ void fileReader(int argc, char** argv) {
             }
             printf("\n");
         }
-    } else {
-        file = fopen(argv[1], "r");
-        printf("Original ASCII    Decimal  Parity \n");
-        printf("-------- -------- -------- -------- \n");
-
-        while ((num = fgetc(file)) != EOF) {
-            val[i] = num - 48;
-            i++;
-            //put values into array until all 8 binary numbers are recieved
-            if (i % 8 == 0) {
-                //binary number recieved, print the converted data taken from binary
-                printInfo(val);
-                //reset the array to all 0s
-                for (z = 0; z < 8; z++) {
-                    val[z] = 0;
-                }
-                i = 0;
-                if ((num = fgetc(file)) == EOF) {
-                    break;
-                }
-                printf("\n");
-            }
-        }
-        printInfo(val);
-        printf("\n");
     }
+    printf("\n")
 }
 
 int main(int argc, char** argv) {
