@@ -75,6 +75,7 @@ void fileLoop(char * arg)
         } else {
             val[z] = fileContents[i] - 48;
             z++;
+            //incrememnt i to move over the space
             i++;
             //put values into array until all 8 binary numbers are received
             if (z == 8) {
@@ -94,24 +95,26 @@ void fileLoop(char * arg)
 }
 
 
-void fileReader(int argc, char** argv) {
+void handleArgs(int argc, char** argv) {
 
     struct stat checkFile;
     int val[8] = { 0 };
-    int i = 0, z = 0, fd = 0;
+    int i = 0, z = 0, fd = 0, dashFound = 0;
     char consoleContents[160];
     size_t numBytes;
     ssize_t bytesRead;
     char dash = '-';
+    char space = ' ';
 
     printf("Original ASCII    Decimal  Parity \n");
     printf("-------- -------- -------- -------- \n");
 
     if (strcmp(argv[1],dash) == 0){
-
+        //first argument is a dash, no need to check for filename
+        dashFound++;
     }
     //checks to see if a filename was input or instead just binary
-    if (checkFile(argv[1], &checkFile) == 0)
+    if (checkFile(argv[1], &checkFile) == 0 && dashFound == 0)
     {
         fileLoop(argv[1]);
     } else {
@@ -119,33 +122,42 @@ void fileReader(int argc, char** argv) {
         numBytes = sizeof(consoleContents);
         bytesRead = read(fd, consoleContents, numBytes);
 
-        for(i = 0; i < bytesRead; i++)
+        for( i =0; i < bytesRead; i++)
         {
-
-        }
-    }
-
-    if (strcmp(test, argv[1]) == 0) {
-        //there was no file name so read the 8 bits from the command line
-        for (i = 2; i < argc; i++)
-        {
-            test = argv[i];
-            for(z = 0; z < 8; i++)
+            if(space == consoleContents[i] && (z < 8 && z > 0))
             {
-                val[z] = test[z] - 48;
+                printInfo(val);
+                //reset the array to all 0s
+                for (z = 0; z < 8; z++)
+                {
+                    val[z] = 0;
+                }
+                printf("\n");
+            } else {
+                val[z] = consoleContents[i] - 48;
+                z++;
+                //incrememnt i to move over the space
+                i++;
+                //put values into array until all 8 binary numbers are received
+                if (z == 8)
+                {
+                    //binary number received, print the converted data taken from binary
+                    printInfo(val);
+                    //reset the array to all 0s
+                    for (z = 0; z < 8; z++)
+                    {
+                        val[z] = 0;
+                    }
+                    printf("\n");
+                }
             }
-            printInfo(val);
-            //reset the array to all 0s
-            for (z = 0; z < 8; z++) {
-                val[z] = 0;
-            }
-            printf("\n");
+            z = 0;
         }
     }
-    printf("\n")
+    printf("\n");
 }
 
 int main(int argc, char** argv) {
-    fileReader(argc, argv);
+    handleArgs(argc, argv);
     return 0;
 }
