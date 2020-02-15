@@ -1,10 +1,17 @@
 #include <stdio.h>
 #include <math.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <io.h>
+//#include <io.h>
+#include <unistd.h>
+#include <fcntl.h>
 
+/*
+ * Programmer: Arnaldo Torres
+ * COMP 322
+ * LAB 0:
+ * read from console or read from a file, and then convert to ascii and decimal and show parity
+ *
+ */
 //converts binary number to decimal number
 int binToDec(int x[]) {
     int i, dec = 0, z = 0;
@@ -32,129 +39,131 @@ char* parity(int x[]) {
     }
 }
 
+//functon to print ascii characters that are outside the printable section
+char * iAscii(int n)
+{
+    char * nonPrint[34] = {
+            "NUL", "SOH", "STX", "ETX" , "EOT", "ENQ", "ACK", "BEL", "BS",
+            "HT", "LF", "VT", "FF", "CR", "SO", "SI", "DLE", "DC1", "DC2",
+            "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EM", "SUB", "ESC", "FS",
+            "GS", "RS", "US", "DEL"
+    };
+
+    if (n == 127){
+        return nonPrint[34];
+    } else {
+        return nonPrint[n];
+    }
+}
+
 void printInfo(int x[]) {
-    int i = 0;
+    int i = 0, dec = binToDec(x);
     //print the 8 binary numbers
     for (i = 0; i < 8; i++)
     {
         printf("%d", x[i]);
     }
-    printf("\t");
-
     //print ascii char
-    printf("%c", binToDec(x));
+    if(dec < 33 || dec == 127)
+    {
+        printf("%9s", iAscii(dec));
+    } else {
+        printf("%9c", binToDec(x));
+    }
 
     //print dec version
-    printf("%8d\t", binToDec(x));
+    printf("%9d", dec);
 
     //print parity
-    printf("%s", parity(x));
+    printf("%9s", parity(x));
 }
 
 void fileLoop(char * arg)
 {
-    int i = 0, z = 0, num = 0;
+    int i = 0, z = 0;
     int val[8] = { 0 };
-    char fileContents[160];
+    char fileContents[150] = { 0 };
     char space = ' ';
-    FILE * file;
-    file = open(arg, "r");
-    int fd = fileno(file);
-    size_t numBytes = sizeof(fileContents);;
-    ssize_t bytesRead = read(fd, fileContents, numBytes);
 
-    for( i =0; i < bytesRead; i++)
+    int fd = open(arg, O_RDONLY);
+    int valRead = read(fd, fileContents, 150);
+
+    for( i = 0; i < valRead - 1; i++)
     {
-        if(space == fileContents[i] && (z < 8 && z > 0)){
-            printInfo(val);
-            //reset the array to all 0s
-            for (z = 0; z < 8; z++) {
-                val[z] = 0;
-            }
-            printf("\n");
-        } else {
-            val[z] = fileContents[i] - 48;
-            z++;
-            //incrememnt i to move over the space
-            i++;
-            //put values into array until all 8 binary numbers are received
-            if (z == 8) {
-                //binary number recieved, print the converted data taken from binary
+        for(z = 0; z < 8; z++) {
+            if (space == fileContents[i] || fileContents[i] == '\000') {
                 printInfo(val);
                 //reset the array to all 0s
                 for (z = 0; z < 8; z++) {
                     val[z] = 0;
                 }
                 printf("\n");
-            }
-        }
-        z = 0;
-    }
-    // printInfo(val);
-    free(file);
-}
-
-
-void handleArgs(int argc, char** argv) {
-
-    struct stat checkFile;
-    int val[8] = { 0 };
-    int i = 0, z = 0, fd = 0, dashFound = 0;
-    char consoleContents[160];
-    size_t numBytes;
-    ssize_t bytesRead;
-    char dash = '-';
-    char space = ' ';
-
-    printf("Original ASCII    Decimal  Parity \n");
-    printf("-------- -------- -------- -------- \n");
-
-    if (strcmp(argv[1],dash) == 0){
-        //first argument is a dash, no need to check for filename
-        dashFound++;
-    }
-    //checks to see if a filename was input or instead just binary
-    if (checkFile(argv[1], &checkFile) == 0 && dashFound == 0)
-    {
-        fileLoop(argv[1]);
-    } else {
-        //filename not found read contents from the console
-        numBytes = sizeof(consoleContents);
-        bytesRead = read(fd, consoleContents, numBytes);
-
-        for( i =0; i < bytesRead; i++)
-        {
-            if(space == consoleContents[i] && (z < 8 && z > 0))
-            {
-                printInfo(val);
-                //reset the array to all 0s
-                for (z = 0; z < 8; z++)
-                {
-                    val[z] = 0;
-                }
-                printf("\n");
+                break;
             } else {
-                val[z] = consoleContents[i] - 48;
-                z++;
-                //incrememnt i to move over the space
-                i++;
+                val[z] = fileContents[i] - 48;
+
                 //put values into array until all 8 binary numbers are received
-                if (z == 8)
-                {
+                if (z == 7) {
                     //binary number received, print the converted data taken from binary
                     printInfo(val);
                     //reset the array to all 0s
-                    for (z = 0; z < 8; z++)
-                    {
+                    for (z = 0; z < 8; z++) {
                         val[z] = 0;
                     }
                     printf("\n");
                 }
             }
-            z = 0;
+            i++;
         }
     }
-    printf("\n");
+}
+
+void handleArgs(int argc, char** argv) {\
+
+    if (argc < 2){
+        //no input end program
+        printf("less than 2 arg");
+    } else {
+        int val[8] = {0};
+        int i = 0, z = 0, dashFound = 0, notFile = 0;
+        char* dash = "-";
+
+        printf("Original ASCII    Decimal  Parity \n");
+        printf("-------- -------- -------- -------- \n");
+
+        if (strcmp(dash,argv[1]) == 0) {
+            //first argument is a dash, no need to check for filename
+            dashFound++;
+        }
+            //check that first char is either binary or text
+        else if ((argv[1][0] == '1' || argv[1][0] == '0')){
+            notFile++;
+        }
+        //checks to see if a filename was input or instead just binary
+        if (notFile == 0 && dashFound == 0) {
+            fileLoop(argv[1]);
+        } else {
+            //filename not found read contents from the console
+            for( i = 1; i < argc; i++) {
+                if (dashFound > 0) {
+                    //decrement to avoid redundant skips
+                    dashFound--;
+                    //skip past the dash element
+                    continue;
+                } else {
+                    for (z = 0; z < strlen(argv[i]); z++) {
+                        val[z] = argv[i][z] - 48;
+                    }
+                    printInfo(val);
+                    for (z = 0; z < 8; z++) {
+                        val[z] = 0;
+                    }
+                    printf("\n");
+                }
+            }
+        }
+        printf("\n");
+    }
 }
 
 int main(int argc, char** argv) {
