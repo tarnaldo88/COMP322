@@ -9,28 +9,30 @@
 
 void childPids(pid_t pid, pid_t ppid)
 {
-    printf("PPID: %d, ", pid);
-    printf("PID: $d\n", ppid);
+    printf("PPID: %d, ", (int)ppid);
+    printf("PID: %d \n", (int)pid);
+    exit(EXIT_SUCCESS);
 }
 
 void parentPids(pid_t pid, pid_t ppid, pid_t cpid, int status) {
     printf("PPID: %d, ", ppid);
-    printf("PID: $d, CPID: %d, RETVAL: %d", getpid, cpid, WIFEXITED(status));
+    printf("PID: %d, CPID: %d, RETVAL: %d\n", pid, cpid, WIFEXITED(status));
 }
 
 void timesChild(clock_t userTime, clock_t sysTime){
-    printf("CUSER: %d,CSYS: %d", (int)userTime, (int)sysTime);
+    printf("USER: %d,SYS: %d \n", (int)userTime, (int)sysTime);
 }
 
 void timesParent(clock_t userTime, clock_t sysTime){
-    printf("CUSER: %d, CSYS: %d\n", (int)userTime, (int)sysTime);
+    printf("CUSER: %d, CSYS: %d", (int)userTime, (int)sysTime);
 
 }
 
 int main() {
-    time_t seconds = time(NULL);
+    time_t seconds;
+    time(&seconds);
     printf("START: %ld\n", seconds);
-    pid_t pid, ppid, pWait;
+    pid_t pid, pWait;
     int status;
 
     pid = fork();
@@ -49,9 +51,10 @@ int main() {
         //do parent processes
         parentPids(getpid(), getppid(), pid, status);
         times(&clockTime);
-        timesChild(clocks.tms_utime, clocks.tms_stime);
-        timesParent(clocks.cutime, clocks.cstime);
+        timesChild(clockTime.tms_utime, clockTime.tms_stime);
+        timesParent(clockTime.tms_cutime, clockTime.tms_cstime);
     }
-    printf("\nSTOP: %d", time(NULL));
+    time(&seconds);
+    printf("\nSTOP: %ld\n", seconds);
     return 0;
 }
