@@ -12,27 +12,26 @@ programs.
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/errno.h>
-#include <unistd.h>  // fork
+#include <unistd.h>  
 #include <stdlib.h>
 #include <sys/wait.h>
 
-void launcher(pid_t proc);
+void launcher(int argc, char *argv[]);
 
-int main(int argc, char *argv[]){
-    pid_t pid;
-    launcher(pid);    
+int main(int argc, char *argv[]) {    
+    launcher(argc, argv);    
     return 0;
 }
 //launch function, forks and launches program
-void launcher(pid_t proc){
+void launcher() {
+    pid_t proc = fork();
     int loc;
     proc = fork();
 
-    if(pid == 0)
-    {
+    if (proc == 0) {
         //if 0 then child proc
         execve(argv[1], argv + 1, NULL);
-    } else if (pid == -1){
+    } else if (proc == -1) {
         //fork failed
         printf("Fork failed, error %d\n", errno);
         exit(EXIT_FAILURE);
