@@ -1,44 +1,40 @@
 /*
 Programmer: Arnaldo Torres
-COMP 322
-3/4/20
-Lab2: Launch-Tube
-Overview:
-In this lab, you will develop two programs.  The two programs are designed to be down in two parts. 
-The first part is a program called “launch”, whereas the second part is a program called “tube”.  
-You will also need to modify the original makefile to allow the Professor to build your two software 
-programs.
+Due date: 3/14/20
+Lab2 Launch tube assignemnt
+Launch program
 */
-#include <stdio.h>
 #include <sys/types.h>
-#include <sys/errno.h>
-#include <unistd.h>  
-#include <stdlib.h>
 #include <sys/wait.h>
+#include <errno.h> 
+#include <unistd.h> 
+#include <stdio.h>  
+#include <stdlib.h>
 
-void launcher(int argc, char *argv[]);
+void launcher(char *argv[]);
 
-int main(int argc, char *argv[]) {    
-    launcher(argc, argv);    
+int main(int argc, char *argv[]){
+    launcher(argv);
     return 0;
 }
-//launch function, forks and launches program
-void launcher() {
-    pid_t proc = fork();
-    int loc;
-    proc = fork();
 
-    if (proc == 0) {
-        //if 0 then child proc
+void launcher(char *argv[]){
+    pid_t  pid = fork();
+
+    if (pid == 0){
+        //child process
         execve(argv[1], argv + 1, NULL);
-    } else if (proc == -1) {
-        //fork failed
-        printf("Fork failed, error %d\n", errno);
-        exit(EXIT_FAILURE);
+    }
+    else if (pid == -1){
+        fprintf(stderr, "System was not able to fork. Error: %d\n", errno);
+        exit(EXIT_FAILURE);        
     } else {
-        //in parent process due to fork returning positive value
-        printf(stderr, "%s: $$ = %d\n", argv[1], proc);
-        waitpid(proc, &loc,0);
-        printf(stderr, "%s: $? = %d \n", argv[1], loc);
+        //parent process
+         int location;
+         fprintf(stderr, "%s: $$ = %d\n", argv[1], pid);
+         waitpid(pid, &location, 0);
+         if(WIFEXITED(location) != 0){
+           fprintf(stderr, "%s: $? = %d\n", argv[1], WEXITSTATUS(location));
+         }
     }
 }

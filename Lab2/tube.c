@@ -1,59 +1,69 @@
-/*
+/* 
 Programmer: Arnaldo Torres
-COMP 322
-3/4/20
-Lab2: Launch-Tube
-Overview:
-In this lab, you will develop two programs.  The two programs are designed to be down in two parts. 
-The first part is a program called “launch”, whereas the second part is a program called “tube”.  
-You will also need to modify the original makefile to allow the Professor to build your two software 
-programs.
+Due date: 3/14/20
+Lab2 Launch tube assignemnt
+Tube program
 */
-#include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
-#include <sys/errno.h>
-#include <unistd.h>  
-#include <stdlib.h>
 #include <sys/wait.h>
+#include <errno.h> 
+#include <unistd.h> 
+#include <stdio.h>  
+#include <stdlib.h>
 
-void tube(int argc, char *argv[]);
 
-int main(int argc, char *argv[])
-{
-    tube(argc, argv);    
-    return 0;
-}
 
-void tube(int argc, char *argv[]){
-    int pipefd[2];
-    pipe(pipefd);
-    pid_t  proc = fork();
-
-    if (proc == 0) {
-        //if 0 then child proc
-        execve(argv[1], argv + 1, NULL);
-    } else if (proc == -1) {
-        //fork failed
-        printf("Fork failed, error %d\n", errno);
-        exit(EXIT_FAILURE);
-    } else {
-        pid_t process_id2 = fork();
-        if (process_id2 > 0)
-        {
-             fprintf(stderr, "%s: $$ = %d\n", argv[1], process_id);
-             fprintf(stderr, "%s: $$ = %d\n", argv[4], process_id2);
-        }
-        else if (process_id2 == 0)
-        
-        {}
-        {
-
-        }
-        /* When fork() returns a positive number, we are in the parent process
-         (the fork return value is the PID of the newly created child process) */
-         int stat_loc;
-         fprintf(stderr, "%s: $$ = %d\n", argv[1], process_id);
-         waitpid(process_id, &stat_loc, 0);
-         fprintf(stderr, "%s: $? = %d\n", argv[1], stat_loc);
+int main(int argc, char *argv[]){
+     int pFileDesc[2];
+    pipe(pFileDesc);
+    int x = 0;
+    int position;
     
+    while(x < argc){
+        if(strcmp(argv[x] , ",") == 0){
+            argv[x] = NULL;
+            position = x + 1;
+            break;
+        }
+        x++;
+    }
+
+    pid_t  pid = fork();
+
+    if (pid == 0){    
+        //child process because pid is 0 after fork    
+        dup2(pFileDesc[1], 1);
+        execve(argv[1], argv + 1, NULL);
+    }
+    else if (pid == -1)
+    {
+        //error in forking
+        fprintf(stderr, "System was not able to fork. Error: %d\n", errno);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        pid_t secondPid = fork();
+        if (secondPid > 0)
+        {
+             fprintf(stderr, "%s: $$ = %d\n", argv[1], pid);
+             fprintf(stderr, "%s: $$ = %d\n", argv[4], secondPid);
+        }
+        else if (secondPid == 0)
+        {
+            dup2(pFileDesc[0], 0);
+            execve(argv[position], argv + position, NULL);
+            exit(0);
+        }
+         close(pFileDesc[1]);
+         close(pFileDesc[0]);        
+         int location;
+         int secLocation;
+         waitpid(pid, &location, 0);
+         waitpid(secondPid, &secLocation, 0);
+         fprintf(stderr, "%s: $? = %d\n", argv[1], location);
+         fprintf(stderr, "%s: $? = %d\n", argv[1], secLocation);
+    }
+    return 0;
 }
