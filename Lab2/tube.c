@@ -12,21 +12,18 @@ Tube program
 #include <stdio.h>  
 #include <stdlib.h>
 
-
-
 int main(int argc, char *argv[]){
      int pFileDesc[2];
     pipe(pFileDesc);
     int x = 0;
     int position;
     
-    while(x < argc){
+    for(x = 0;x < argc;x++){
         if(strcmp(argv[x] , ",") == 0){
             argv[x] = NULL;
             position = x + 1;
             break;
         }
-        x++;
     }
 
     pid_t  pid = fork();
