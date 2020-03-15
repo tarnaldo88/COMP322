@@ -15,21 +15,35 @@ Tube program
 int main(int argc, char *argv[]){
      int pFileDesc[2];
     pipe(pFileDesc);
-    int x = 0;
+    int x = 1, i = 0;
     int position;
+    char * secArg[argc];
     
-    for(x = 0;x < argc;x++){
+    //x starts at 1 because argv arguments start at [1]
+    for(x = 1;x < argc;x++){
         if(strcmp(argv[x] , ",") == 0){
             argv[x] = NULL;
             position = x + 1;
             break;
         }
+        secArg[x-1] = argv[i];
     }
+    secArg[x-1] = NULL;
 
+    if(argv[x] != NULL){
+        x++;
+        i = 0;
+        for(;x<argc;x++){
+            secArg[i] = argv[x];
+            i++;
+        }
+        secArg[i] = NULL;
+    }
     pid_t  pid = fork();
 
     if (pid == 0){    
-        //child process because pid is 0 after fork    
+        //child process because pid is 0 after fork  
+        close(pFileDesc[0]);  
         dup2(pFileDesc[1], 1);
         execve(argv[1], argv + 1, NULL);
     }
@@ -45,22 +59,20 @@ int main(int argc, char *argv[]){
         if (secondPid > 0)
         {
              fprintf(stderr, "%s: $$ = %d\n", argv[1], pid);
-             fprintf(stderr, "%s: $$ = %d\n", argv[4], secondPid);
+             fprintf(stderr, "%s: $$ = %d\n", secArg[0], secondPid);
         }
         else if (secondPid == 0)
         {
+            close(pFileDesc[1]);
             dup2(pFileDesc[0], 0);
             execve(argv[position], argv + position, NULL);
             exit(0);
-        }
-         close(pFileDesc[1]);
-         close(pFileDesc[0]);        
-         int location;
-         int secLocation;
+        }        
+         int location, secLocation;
          waitpid(pid, &location, 0);
+         close(pFileDesc[1]);
          waitpid(secondPid, &secLocation, 0);
          fprintf(stderr, "%s: $? = %d\n", argv[1], location);
-         fprintf(stderr, "%s: $? = %d\n", argv[1], secLocation);
+         fprintf(stderr, "%s: $? = %d\n", secArg[0], secLocation);
     }
-    return 0;
-}
+    return 0;}
