@@ -31,7 +31,9 @@ void catcher(int argc, char **argv, int count, int sigCount) {
 
     for( i = 0; i < argc; i++){
         //pause();
-        signal(*argv[i], sigHand);
+        //signal(*argv[i], sigHand);
+        signal(SIGINT,sigHand);
+        pause();
         count++;
     }
 
@@ -47,14 +49,14 @@ void sigHand(int sig){
     time_t seconds;
     time(&seconds);
     char * signals[] = {"SIGTERM", "SIGUSR1", "SIGUSR2"};
-
+    printf("inside handler, sig = %d\n", sig);
     if (sig == SIGUSR1){
-        printf("%s caught at : %ld\n", signals[1], seconds);  
+        printf("%s caught at %ld\n", signals[1], seconds);  
     } else if (sig == SIGUSR2){
-        printf("%s caught at : %ld\n", signals[2], seconds);  
+        printf("%s caught at %ld\n", signals[2], seconds);  
     } else if(sig == SIGTERM){
-        printf("%s caught at : %ld\n", signals[0], seconds);
-        
+        printf("%s caught at %ld\n", signals[0], seconds);
+
     }
     /*
     int i = 1;
