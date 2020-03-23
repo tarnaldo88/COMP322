@@ -18,20 +18,19 @@ a program that catches a number of predefined signals, and prints status informa
 #define SIGUSR2 12
 
 void sigHand(int sig);
-void catcher(int argc, char **argv, int sigCount);
+void catcher(int argc, char **argv);
 static int count = 0, termCount = 0; //how many signals have been caught
 static const char signals [31][16] = {"HUP", "INT", "QUIT", "ILL", "TRAP", "ABRT", "BUS", "FPE", "KILL"
                                   "USR1", "EGV", "USR2", "PIPE", "ALRM", "TERM", "CHLD", "CONT", "STOP"
                                   "TSTP", "TTIN", "TTOU", "URG", "XCPU", "XFSZ", "VTALRM", "PROF"
                                   "WINCH", "IO", "PWR", "SYS", "TMIN"};    
 
-int main(int argc, char ** argv){
-    static int sigCount= 0; // sigCount times SIGTERM is caught
-    catcher(argc, argv, sigCount);
+int main(int argc, char ** argv){    
+    catcher(argc, argv);
     return 0;
 }
 
-void catcher(int argc, char **argv, int sigCount) {
+void catcher(int argc, char **argv) {
     int i,x,arrSize;
     char catchThis[38];
     fprintf(stderr, "catcher: $$ = %d\n", getpid());   
