@@ -29,16 +29,17 @@ int main(int argc, char ** argv){
 void catcher(int argc, char **argv) {
     int i,x;    
     fprintf(stderr, "catcher: $$ = %d\n", getpid()); 
-    
+
     for (i = 1; i < argc; i++){
         for(x = 0; x < 31; x++){
             if(strcmp(argv[i],signals[x]) == 0 ){
-                signal(x+1, sigHand);
-                printf("%s was found and needs to be caught\n", signals[x]);
+                signal(x+1, sigHand);                
             }            
         }
     } 
+    while (termCount < 3){
     pause();
+    }
     fprintf(stderr, "catcher: Total signals count = %d\n", count); 
 }
 
