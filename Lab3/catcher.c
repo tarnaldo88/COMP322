@@ -19,12 +19,11 @@ a program that catches a number of predefined signals, and prints status informa
 
 void sigHand(int sig);
 void catcher(int argc, char **argv, int sigCount);
-static int count = 0; //how many signals have been caught
+static int count = 0, termCount = 0; //how many signals have been caught
 static const char signals [31][16] = {"HUP", "INT", "QUIT", "ILL", "TRAP", "ABRT", "BUS", "FPE", "KILL"
                                   "USR1", "EGV", "USR2", "PIPE", "ALRM", "TERM", "CHLD", "CONT", "STOP"
                                   "TSTP", "TTIN", "TTOU", "URG", "XCPU", "XFSZ", "VTALRM", "PROF"
-                                  "WINCH", "IO", "PWR", "SYS", "TMIN"};
-    
+                                  "WINCH", "IO", "PWR", "SYS", "TMIN"};    
 
 int main(int argc, char ** argv){
     static int sigCount= 0; // sigCount times SIGTERM is caught
@@ -45,26 +44,18 @@ void catcher(int argc, char **argv, int sigCount) {
             }            
         }
     } 
-pause();
-     /*for( i = 0; i < argc; i++){
-        //pause();
-        //signal(*argv[i], sigHand);
-        signal(2,sigHand);
-        pause();
-        count++;
-    }
-
-    if (signal(SIGINT,sigHand) == SIG_ERR){
-            //error wasnt able to intrepret signal
-             exit(EXIT_FAILURE); 
-        }  */    
-
+    pause();
     fprintf(stderr, "catcher: Total signals count = %d\n", count); 
 }
 
 void sigHand(int sig){
     time_t seconds;
     time(&seconds);
+    if(sig == 15){
+        termCount++;
+    } else{
+        termCount = 0;
+    }
     count++;
-    printf(" SIG%s caught at %ld\n", signals[sig-1], seconds);    
+    printf(" SIG%s caught at %ld\n", signals[sig-1], seconds); 
 }
