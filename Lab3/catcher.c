@@ -41,6 +41,7 @@ void catcher(int argc, char **argv) {
     pause();
     }
     fprintf(stderr, "catcher: Total signals count = %d\n", count); 
+    exit(EXIT_SUCCESS);
 }
 //signal handler function that checks if incoming signal is SIGTERM and also prints the signal it caught
 void sigHand(int sig){
