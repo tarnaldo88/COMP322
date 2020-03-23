@@ -2,10 +2,9 @@
 Programmer: Arnaldo Torres
 Due Date: 3/23/20
 Program: Catcher
-a program that catches a number of predefined signals, and prints status information on stdout.
-
+a program that catches a number of predefined signals, 
+and prints status information on stdout.
 */
-
 #include <signal.h>
 #include <string.h>
 #include <sys/types.h>
@@ -13,9 +12,6 @@ a program that catches a number of predefined signals, and prints status informa
 //#include <unistd.h> 
 #include <stdio.h>  
 #include <stdlib.h>
-
-#define SIGUSR1 10
-#define SIGUSR2 12
 
 void sigHand(int sig);
 void catcher(int argc, char **argv);
