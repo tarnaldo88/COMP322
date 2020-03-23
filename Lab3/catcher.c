@@ -40,7 +40,7 @@ void catcher(int argc, char **argv) {
     while (termCount < 3){ //loops until three consecutive SIGTERM is caught
     pause();
     }
-    fprintf(stderr, "catcher: Total signals count = %d\n", count);
+    fprintf(stderr, "catcher: Total signals count = %d\n", count);    
     if(termCount == 3){ 
         exit(EXIT_SUCCESS);
     }
