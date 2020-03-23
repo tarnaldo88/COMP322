@@ -27,9 +27,14 @@ int main(int argc, char ** argv){
 }
 
 void catcher(int argc, char **argv) {
-    int i,x,arrSize;
-    char catchThis[38];
-    fprintf(stderr, "catcher: $$ = %d\n", getpid());   
+    int i,x;    
+    fprintf(stderr, "catcher: $$ = %d\n", getpid()); 
+    
+    if(strcmp("USR1",signals[9]) == 0){
+        printf("asdfas\n");
+    } else {
+        printf("didnt work");
+    }
 
     for (i = 1; i < argc; i++){
         for(x = 0; x < 31; x++){
