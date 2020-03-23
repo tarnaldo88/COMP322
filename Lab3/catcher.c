@@ -7,6 +7,7 @@ a program that catches a number of predefined signals, and prints status informa
 */
 
 #include <signal.h>
+#include <string.h>
 #include <sys/types.h>
 #include <errno.h> 
 //#include <unistd.h> 
@@ -17,22 +18,38 @@ a program that catches a number of predefined signals, and prints status informa
 #define SIGUSR2 12
 
 void sigHand(int sig);
-void catcher(int argc, char **argv, int count, int sigCount);
+void catcher(int argc, char **argv, int sigCount);
+static int count = 0; //how many signals have been caught
+static const char signals [31][16] = {"HUP", "INT", "QUIT", "ILL", "TRAP", "ABRT", "BUS", "FPE", "KILL"
+                                  "USR1", "EGV", "USR2", "PIPE", "ALRM", "TERM", "CHLD", "CONT", "STOP"
+                                  "TSTP", "TTIN", "TTOU", "URG", "XCPU", "XFSZ", "VTALRM", "PROF"
+                                  "WINCH", "IO", "PWR", "SYS", "TMIN"};
+    
 
 int main(int argc, char ** argv){
-    static int sigCount= 0, count = 0; // sigCount times SIGTERM is caught;  count = total signals
-    catcher(argc,argv, count, sigCount);
+    static int sigCount= 0; // sigCount times SIGTERM is caught
+    catcher(argc, argv, sigCount);
     return 0;
 }
 
-void catcher(int argc, char **argv, int count, int sigCount) {
-    int i;
-    fprintf(stderr, "catcher: $$ = %d\n", getpid());    
+void catcher(int argc, char **argv, int sigCount) {
+    int i,x,arrSize;
+    char catchThis[38];
+    fprintf(stderr, "catcher: $$ = %d\n", getpid());   
 
-    for( i = 0; i < argc; i++){
+    for (i = 1; i < argc; i++){
+        for(x = 0; x < 31; x++){
+            if(strcmp(argv[i],signals[x]) == 0 ){
+                signal(x+1, sigHand);
+                printf("%s was found and needs to be caught\n", signals[x]);
+            }            
+        }
+    } 
+pause();
+     /*for( i = 0; i < argc; i++){
         //pause();
         //signal(*argv[i], sigHand);
-        signal(SIGINT,sigHand);
+        signal(2,sigHand);
         pause();
         count++;
     }
@@ -40,7 +57,7 @@ void catcher(int argc, char **argv, int count, int sigCount) {
     if (signal(SIGINT,sigHand) == SIG_ERR){
             //error wasnt able to intrepret signal
              exit(EXIT_FAILURE); 
-        }      
+        }  */    
 
     fprintf(stderr, "catcher: Total signals count = %d\n", count); 
 }
@@ -48,23 +65,6 @@ void catcher(int argc, char **argv, int count, int sigCount) {
 void sigHand(int sig){
     time_t seconds;
     time(&seconds);
-    char * signals[] = {"SIGTERM", "SIGUSR1", "SIGUSR2"};
-    printf("inside handler, sig = %d\n", sig);
-    if (sig == SIGUSR1){
-        printf("%s caught at %ld\n", signals[1], seconds);  
-    } else if (sig == SIGUSR2){
-        printf("%s caught at %ld\n", signals[2], seconds);  
-    } else if(sig == SIGTERM){
-        printf("%s caught at %ld\n", signals[0], seconds);
-
-    }
-    /*
-    int i = 1;
-    printf("inside sigHand\n");
-    for (;i < argc; i++) {
-        if (sig == argv[i]){
-            printf("%s caught at : %ld\n", argv[i], seconds);            
-        }
-    }
-    */
+    count++;
+    printf(" SIG%s caught at %ld\n", signals[sig-1], seconds);    
 }
