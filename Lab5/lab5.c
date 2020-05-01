@@ -24,7 +24,6 @@ int calculate(int argc, char **argv){
         printf("The address %d contains:\n", address);		
 		printf("page number = %d\n", pageNumber(pSize, address)); //prints page Number
         printf("offset = %d\n", offset(pSize, address)); // prints offset
-
         return 1;		
     } else {
         printf("Error: invalid number of arguments\n");
