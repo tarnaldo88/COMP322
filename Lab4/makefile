@@ -14,11 +14,11 @@ all: $(EXEC)
 $(EXEC):
 
 launch-philosophers:
-	chmod +x &(SRC2)
+	chmod +x $(SRC2)
 
 dining-p:
-	$(CC) $(CFLAGS) -c $(SRC) ${-lpthread -lrt} -Wall -Wextra
-	$(CC) $(CFLAGS) -o $(SRC) $(OBJ) ${-lpthread -lrt}
+	$(CC) $(CFLAGS) -c $(SRC) -lpthread -lrt -Wall -Wextra
+	$(CC) $(CFLAGS) -o $(SRC) $(OBJ) -lpthread -lrt
 
 CLEAN:
 		rm -f $(EXEC) $(OBJ) *~
