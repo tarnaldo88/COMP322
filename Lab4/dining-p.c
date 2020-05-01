@@ -24,7 +24,7 @@ void dining(int argc, char **argv);
 void eating(int pos);
 void thinking(int pos);
 
-static int end; //value to know when to end dining loop
+static int end = 0; //value to know when to end dining loop
 
 int main(int argc, char **argv){
   dining(argc, argv);
