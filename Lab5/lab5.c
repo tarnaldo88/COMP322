@@ -12,7 +12,7 @@ unsigned int pageNumber(int pSize, unsigned int address);
 unsigned int offset(int pSize, unsigned int address);
 
 void main(int argc, char **argv){    
-    return calculate(argc,argv) ? EXIT_SUCCESS : EXIT_FAILURE;
+    calculate(argc,argv) ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
 }
 
 int calculate(int argc, char **argv){
