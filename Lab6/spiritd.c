@@ -36,9 +36,9 @@ void spirit(){
         exit(0); //parent is killed, daemon will run in background
     }
     if (dPID == 0) {
-        signal(SIGTERM, handler);
-        signal(SIGUSR1, handler);
-        signal(SIGUSR2, handler);
+        signal(SIGTERM, sigHandler);
+        signal(SIGUSR1, sigHandler);
+        signal(SIGUSR2, sigHandler);
         //Change file permissions of daemon
         umask(0); 
         if ((sid = setsid()) < 0){
@@ -76,20 +76,20 @@ static void sigHandler(int sig){
         kill(mole1, SIGTERM);
         exit(0);
     } else if(sig == SIGUSR2){
-        randomMoleChoose();
-        (void) signal(SIGUSR2, handler);
+        randMole();
+        (void) signal(SIGUSR2, sigHandler);
     } else if(sig == SIGUSR1){
-        randomMoleChoose();
-        (void) signal(SIGUSR1, handler);
+        randMole();
+        (void) signal(SIGUSR1, sigHandler);
     }
 }
 
 void randMole(){
     char moleNum[30];
-    var = rand() % 2;
+    int var = rand() % 2;
     sprintf(moleNum, "%d", var + 1);
     char * mArgv[] = {"mole", moleNum, 0};
-    if (num == 0){
+    if (moleNum == 0){
         if (kill(mole1, SIGCHLD) < 0){
             fprintf(stderr, "Process already killed");
         }
