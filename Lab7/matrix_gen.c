@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 }
 
 void matrixGen(int argc, char** argv){
-    int var, y = 0, x = 0, ret;
+    int y = 0, x = 0;
     int N = atoi(argv[1]);   
 
     if (argc != 2){
