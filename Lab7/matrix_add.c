@@ -6,7 +6,7 @@ Lab7: Program to generate a matrix
 #include <stdio.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include <sys/aio.h>
+#include <aio.h>
 #include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
@@ -95,7 +95,7 @@ void matrixValidation(int argc, char ** argv) {
         while (aio_error(&next) == EINPROGRESS){}
 
         //add values
-        matrixAdd(&current, &st);
+        matrixAdd(&current, &varStruct);
 
         //use memcpy to copy current block into the previous block
         memcpy(&last, &current, sizeof(struct aiocb));
