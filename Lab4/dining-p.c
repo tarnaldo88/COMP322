@@ -33,7 +33,7 @@ int main(int argc, char **argv){
 
 //handles SIGTERM, and flips switch to end loop and end program
 void sigHandler(int sig) {
-	signal(SIGTERM, sig);
+	signal(SIGTERM, sigHandler);
     printf("SIGTERM(%d) processed\n", sig);
 	end = 1;
 }
@@ -43,7 +43,9 @@ void dining(int argc, char **argv){
     int cycle = 0, i = 0, semVal1, semVal2;
     int pos = atoi(argv[2]);
 	int seats = atoi(argv[1]);
-	sem_t* chop[2], rtn1, rtn2;
+	sem_t * chop[2];
+	sem_t * rtn1;
+	sem_t * rtn2;
 	char name[50], semName1[50], semName2[50]; //50 as an arbitrary number so nothing too random can overflow 
 
 	progCheck(pos,seats,argc);
@@ -62,14 +64,14 @@ void dining(int argc, char **argv){
 	strcat(semName2, name);
 	
     //start the left semaphore
-    rtn1 = sem_open(sem_name_1, O_CREAT | O_EXCL, 0666, 1);
+    rtn1 = sem_open(semName1, O_CREAT | O_EXCL, 0666, 1);
 	if(rtn1 == SEM_FAILED){
-		rtn1 = sem_open(sem_name_1, 0);
+		rtn1 = sem_open(semName1, 0);
 	}
 	//start the right semaphore
-	rtn2 = sem_open(sem_name_2, O_CREAT | O_EXCL, 0666, 1);
+	rtn2 = sem_open(semName2, O_CREAT | O_EXCL, 0666, 1);
 	if(rtn2 == SEM_FAILED){
-		rtn2 = sem_open(sem_name_2, 0);
+		rtn2 = sem_open(semName2, 0);
 	}
 	chop[0] = rtn1;
 	chop[1] = rtn2;
@@ -81,14 +83,14 @@ void dining(int argc, char **argv){
 
     //philosphers start dining
 	do {
-		think(position);
+		think(pos);
 		sem_getvalue(chop[1], &semVal1);
 		sem_getvalue(chop[0], &semVal2);
 
 		//determine if left or right is free to go eat
 		if(semVal1 == 1 && semVal2 == 1){
 
-			eat(position);
+			eat(pos);
 		//eating completed, post that eating is done
 			sem_post(chop[1]);
 			sem_post(chop[0]);
