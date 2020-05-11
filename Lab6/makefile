@@ -1,23 +1,23 @@
-EXECUTABLE-L=spiritd
-EXECUTABLE-T=mole
-SRC-L=spiritd.c
-SRC-T=mole.c
-OBJ-L=spiritd.o
-OBJ-T=mole.o
+EXEC-S=spiritd
+EXEC-M=mole
+SRC-S=spiritd.c
+SRC-M=mole.c
+OBJ-S=spiritd.o
+OBJ-M=mole.o
 
 CC=gcc
 CFLAGS=-g
 
-all: $(EXECUTABLE-L) $(EXECUTABLE-T)
+all: $(EXEC-S) $(EXEC-M)
 
 
-$(EXECUTABLE-L): $(SRC-L)
-	$(CC) $(CFLAGS) -c $(SRC-L)
-	$(CC) $(CFLAGS) -o $@ $(OBJ-L)
+$(EXEC-S): $(SRC-S)
+	$(CC) $(CFLAGS) -c $(SRC-S)
+	$(CC) $(CFLAGS) -o $@ $(OBJ-S)
 
-$(EXECUTABLE-T): $(SRC-T)
-	$(CC) $(CFLAGS) -c $(SRC-T)
-	$(CC) $(CFLAGS) -o $@ $(OBJ-T)
+$(EXEC-M): $(SRC-M)
+	$(CC) $(CFLAGS) -c $(SRC-M)
+	$(CC) $(CFLAGS) -o $@ $(OBJ-M)
 
 clean:
-	rm -f $(EXECUTABLE-L) $(EXECUTABLE-T) $(OBJ-L) $(OBJ-T) *~
+	rm -f $(EXEC-S) $(EXEC-M) $(OBJ-S) $(OBJ-M) *~
