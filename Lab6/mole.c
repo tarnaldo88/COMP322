@@ -17,8 +17,7 @@ int main(int argc, char **argv) {
 
 void mole(int argc, char **argv){
     FILE *filep = fopen("lab6.log", "a");
-    char *
-    if (filep == NULL){
+    if (filep == NULL) {
         fprintf(stderr, "Error: failed to create Lab log");
     }
     if (filep != 0){
@@ -28,6 +27,7 @@ void mole(int argc, char **argv){
         }else{
             m = "Pop mole2";
         }
+        fprintf(logfile,"\n%s",m);
         fclose(filep);
     }
 }
